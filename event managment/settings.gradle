@@ -1,1 +1,6 @@
 rootProject.name = 'event-management-system'
+
+include 'auth-service'
+include 'event-service'
+include 'registration-service'
+include 'notification-service'

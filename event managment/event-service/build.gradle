@@ -1,0 +1,5 @@
+description = 'Event Service'
+
+springBoot {
+    mainClass = 'com.example.event.EventServiceApplication'
+}

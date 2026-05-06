@@ -1,42 +1,18 @@
-# Event Management System Starter
+# Event Management System
 
-This folder contains the Spring Boot starter project for the Event Management System.
+Spring Boot microservices for event management, split into four services backed by a shared PostgreSQL database.
 
-## What is included
+## Services and ports
 
-- Spring Boot starter wired to PostgreSQL
-- Dockerfile for the application container
-- `compose.yaml` for the application and PostgreSQL containers
-- Bash scripts to start, stop, and inspect logs
-- Starter layered architecture for Auth, Event, Registration, and Notification
+- Auth service: 8081
+- Event service: 8082
+- Registration service: 8083
+- Notification service: 8084
+- PostgreSQL: 5433
 
-## Architecture
+## Run with Docker (dev)
 
-The codebase is scaffolded with a layered structure:
-
-- `presentation/`: controllers and request DTOs
-- `application/`: service layer and business flow entry points
-- `data/`: JPA repositories
-- `domain/`: entities and enums
-- `config/`: shared framework configuration
-
-## Package layout
-
-```text
-src/main/java/com/example/demo
-├── application
-├── common
-├── config
-├── data
-├── domain
-└── presentation
-```
-
-The current controllers intentionally return `501 Not Implemented` for unfinished business endpoints. This lets the application boot cleanly while showing your team where to continue implementation.
-
-## Run with Docker
-
-From this folder, run:
+From [event managment](event%20managment):
 
 ```bash
 ./start.sh
@@ -49,32 +25,53 @@ Useful commands:
 ./stop.sh
 ```
 
+`start.sh` uses `compose.yaml` + `compose.dev.yaml` to run each service with `bootRun` and live reload.
+
 ## Environment values
 
-Copy `.env.example` to `.env` if you want to customize ports or database credentials.
+Copy `.env.example` to `.env` if you want to customize ports, credentials, or service URLs.
 
 Default values:
 
 ```text
-APP_PORT=8080
+AUTH_PORT=8081
+EVENT_PORT=8082
+REGISTRATION_PORT=8083
+NOTIFICATION_PORT=8084
 DB_PORT=5433
+
 POSTGRES_DB=event_management
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
+
+JWT_SECRET=SuperSecretSuperSecretSuperSecret123456
+JWT_EXPIRATION_DAYS=7
+SERVICE_TOKEN=SuperDuperServiceTokenKey
 ```
 
-## Health endpoint
+`JWT_SECRET` must be at least 32 bytes for HS256.
 
-After startup, verify the app is running:
+## Health endpoints
 
 ```text
-GET http://localhost:8080/api/health
+GET http://localhost:8081/health
+GET http://localhost:8082/health
+GET http://localhost:8083/health
+GET http://localhost:8084/health
 ```
 
-## Local Gradle run
+Note: current security rules may return 401/403 for health checks unless you permit `/health` in each service.
 
-If you want to run the app without Docker, make sure PostgreSQL is running locally and then use:
+## Authentication
 
-```bash
-./gradlew bootRun
-```
+- `POST /api/auth/register` and `POST /api/auth/login` return `{ "token": "..." }`.
+- Pass the token as `Authorization: Bearer <token>` to protected routes.
+- Internal service-to-service calls use `X-Service-Token` for `/internal/**` endpoints.
+
+## API basics
+
+- Events: `GET /api/events?mine=&status=&from=&to=&sort=field,asc|desc`
+- Notifications: `GET /api/notifications?seen=&from=&to=&eventId=&sort=createdAt,asc|desc`
+- Registrations: `POST /api/registrations` with `{ "eventId": "..." }`
+
+Error responses include `message` and validation details for easier debugging.

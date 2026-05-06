@@ -1,0 +1,5 @@
+description = 'Notification Service'
+
+springBoot {
+    mainClass = 'com.example.notification.NotificationServiceApplication'
+}

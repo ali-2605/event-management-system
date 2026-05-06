@@ -8,5 +8,4 @@ if [ ! -f "${ENV_FILE}" ]; then
   cp "${SCRIPT_DIR}/.env.example" "${ENV_FILE}"
 fi
 
-docker compose --env-file "${ENV_FILE}" -f "${SCRIPT_DIR}/compose.yaml" up --build -d
-docker compose --env-file "${ENV_FILE}" -f "${SCRIPT_DIR}/compose.yaml" ps
+docker compose --env-file "${ENV_FILE}" -f "${SCRIPT_DIR}/compose.yaml" -f "${SCRIPT_DIR}/compose.dev.yaml" up -d
