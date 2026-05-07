@@ -1,1 +1,82 @@
+# --- Custom & Initial Rules ---
 .opencode/
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# --- Flutter/Dart Specific ---
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+# If you use FVM (Flutter Version Manager)
+.fvm/flutter_sdk
+# Keep the icons/splash generation cache clean
+.metadata
+
+# --- Android Specific ---
+**/android/**.gradle
+**/android/local.properties
+**/android/key.properties
+**/android/app/**.keystore
+**/android/app/**.jks
+**/android/app/src/main/res/generated
+# Note: Keep the Gradle wrapper as per your initial config
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# --- iOS/macOS Specific ---
+**/ios/.generated/
+**/ios/Flutter/ephemeral/
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.[mh]
+**/ios/Podfile.lock
+DerivedData/
+.lsconnect
+
+# --- Android Studio / IntelliJ IDEA ---
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+.env
+*.lck
+# Android Studio specific ignore for local settings
+.idea/modules.xml
+.idea/workspace.xml
+.idea/libraries/
+.idea/caches/
+.idea/assetWizardSettings.xml
+
+# --- VS Code ---
+.vscode/
+*.code-workspace
+
+# --- Other IDEs (STS, NetBeans) ---
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# --- System Files ---
+.DS_Store
+Thumbs.db
