@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: auth-service/Dockerfile
+      network: host
     depends_on:
       db:
         condition: service_healthy
@@ -21,6 +22,7 @@ services:
     build:
       context: .
       dockerfile: event-service/Dockerfile
+      network: host
     depends_on:
       db:
         condition: service_healthy
@@ -41,6 +43,7 @@ services:
     build:
       context: .
       dockerfile: registration-service/Dockerfile
+      network: host
     depends_on:
       db:
         condition: service_healthy
@@ -60,6 +63,7 @@ services:
     build:
       context: .
       dockerfile: notification-service/Dockerfile
+      network: host
     depends_on:
       db:
         condition: service_healthy
