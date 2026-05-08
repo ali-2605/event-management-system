@@ -14,7 +14,7 @@ COPY gradlew ./
 COPY notification-service ./notification-service
 
 # Ensure other project directories exist so the root `settings.gradle` can configure them
-RUN mkdir -p /build/auth-service /build/event-service /build/registration-service /build/integration-tests
+RUN mkdir -p /build/auth-service /build/event-service /build/registration-service /build/gateway /build/eureka-server /build/integration-tests
 
 # Build only the notification-service using a shared Gradle cache
 RUN --mount=type=cache,id=gradle-cache,target=/home/gradle/.gradle,sharing=locked gradle :notification-service:bootJar --no-daemon

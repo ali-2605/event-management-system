@@ -14,7 +14,7 @@ COPY gradlew ./
 COPY event-service ./event-service
 
 # Ensure other project directories exist so the root `settings.gradle` can configure them
-RUN mkdir -p /build/auth-service /build/registration-service /build/notification-service /build/integration-tests
+RUN mkdir -p /build/auth-service /build/registration-service /build/notification-service /build/gateway /build/eureka-server /build/integration-tests
 
 # Build only the event-service using a shared Gradle cache
 RUN --mount=type=cache,id=gradle-cache,target=/home/gradle/.gradle,sharing=locked gradle :event-service:bootJar --no-daemon

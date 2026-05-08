@@ -14,7 +14,7 @@ COPY gradlew ./
 COPY registration-service ./registration-service
 
 # Ensure other project directories exist so the root `settings.gradle` can configure them
-RUN mkdir -p /build/auth-service /build/event-service /build/notification-service /build/integration-tests
+RUN mkdir -p /build/auth-service /build/event-service /build/notification-service /build/gateway /build/eureka-server /build/integration-tests
 
 # Build only the registration-service using a shared Gradle cache
 RUN --mount=type=cache,id=gradle-cache,target=/home/gradle/.gradle,sharing=locked gradle :registration-service:bootJar --no-daemon
