@@ -1,6 +1,6 @@
 # Event Management System
 
-Spring Boot microservices for event management, split into four services backed by a shared PostgreSQL database.
+Spring Boot microservices for event management, split into four services backed by a shared PostgreSQL database, plus a Spring Cloud Gateway and Eureka server.
 
 ## Services and ports
 
@@ -8,6 +8,8 @@ Spring Boot microservices for event management, split into four services backed 
 - Event service: 8082
 - Registration service: 8083
 - Notification service: 8084
+- API Gateway: 8080
+- Eureka Server: 8761
 - PostgreSQL: 5433
 
 ## Run with Docker (dev)
@@ -25,7 +27,9 @@ Useful commands:
 ./stop.sh
 ```
 
-`start.sh` uses `compose.yaml` + `compose.dev.yaml` to run each service with `bootRun` and live reload.
+`docker compose up --build` starts the gateway, Eureka server, database, and the four services.
+
+Clients should use the gateway at `http://localhost:8080`.
 
 ## Environment values
 
@@ -54,17 +58,20 @@ SERVICE_TOKEN=SuperDuperServiceTokenKey
 ## Health endpoints
 
 ```text
-GET http://localhost:8081/health
-GET http://localhost:8082/health
-GET http://localhost:8083/health
-GET http://localhost:8084/health
+GET http://localhost:8080/health
+GET http://localhost:8761/health
 ```
 
-Note: current security rules may return 401/403 for health checks unless you permit `/health` in each service.
+The four backend services are now intended to be reached through the gateway in Docker.
 
 ## Authentication
 
 - `POST /api/auth/register` and `POST /api/auth/login` return `{ "token": "..." }`.
+- Gateway routes:
+	- `http://localhost:8080/api/auth/**`
+	- `http://localhost:8080/api/events/**`
+	- `http://localhost:8080/api/registrations/**`
+	- `http://localhost:8080/api/notifications/**`
 - Pass the token as `Authorization: Bearer <token>` to protected routes.
 - Internal service-to-service calls use `X-Service-Token` for `/internal/**` endpoints.
 
@@ -75,3 +82,99 @@ Note: current security rules may return 401/403 for health checks unless you per
 - Registrations: `POST /api/registrations` with `{ "eventId": "..." }`
 
 Error responses include `message` and validation details for easier debugging.
+
+## Tests
+
+From `event managment`:
+
+```bash
+./gradlew testAll
+```
+
+Run a single service test suite:
+
+```bash
+./gradlew :auth-service:test
+./gradlew :event-service:test
+./gradlew :registration-service:test
+./gradlew :notification-service:test
+```
+
+Run gateway and Eureka builds:
+
+```bash
+./gradlew :gateway:bootJar
+./gradlew :eureka-server:bootJar
+```
+
+## Integration Tests
+
+Integration tests verify cross-service communication and flows. They require all services to be running.
+
+### Start services and run integration tests:
+
+```bash
+cd event\ managment
+
+# Terminal 1: Start services
+docker compose up --build
+
+# Terminal 2: Run integration tests
+./gradlew :integration-tests:test
+```
+
+Integration tests verify:
+- User authentication flows (register, login)
+- Service-to-service communication
+- API error handling and validation
+- Health checks across all services
+
+See `integration-tests/src/test/java/com/example/integration/` for test implementations.
+
+## Integration Tests
+
+Integration tests verify cross-service communication and flows. They require all services to be running.
+
+### Start services and run integration tests:
+
+```bash
+cd event\ managment
+
+# Terminal 1: Start services
+docker compose up --build
+
+# Terminal 2: Run integration tests
+./gradlew :integration-tests:test
+```
+
+Integration tests verify:
+- User authentication flows (register, login)
+- Service-to-service communication
+- API error handling and validation
+- Health checks across all services
+
+See `integration-tests/src/test/java/com/example/integration/` for test implementations.
+
+## Integration Tests
+
+Integration tests verify cross-service communication and flows. They require all services to be running.
+
+### Start services and run integration tests:
+
+```bash
+cd event\ managment
+
+# Terminal 1: Start services
+docker compose up --build
+
+# Terminal 2: Run integration tests
+./gradlew :integration-tests:test
+```
+
+Integration tests verify:
+- User authentication flows (register, login)
+- Service-to-service communication
+- API error handling and validation
+- Health checks across all services
+
+See `integration-tests/src/test/java/com/example/integration/` for test implementations.
