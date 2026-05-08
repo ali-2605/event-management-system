@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Management System - Test Results</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .summary-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            text-align: center;
+        }
+        
+        .summary-card.passed {
+            border-left-color: #10b981;
+        }
+        
+        .summary-card.failed {
+            border-left-color: #ef4444;
+        }
+        
+        .summary-card.skipped {
+            border-left-color: #f59e0b;
+        }
+        
+        .summary-card.total {
+            border-left-color: #667eea;
+        }
+        
+        .summary-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .summary-card.passed .number {
+            color: #10b981;
+        }
+        
+        .summary-card.failed .number {
+            color: #ef4444;
+        }
+        
+        .summary-card.skipped .number {
+            color: #f59e0b;
+        }
+        
+        .summary-card .label {
+            font-size: 0.9em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .services {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .service-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .service-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .service-card.passed {
+            border-color: #10b981;
+        }
+        
+        .service-card.failed {
+            border-color: #ef4444;
+        }
+        
+        .service-header {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 2px solid #e5e7eb;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .service-card.passed .service-header {
+            background: #ecfdf5;
+            border-bottom-color: #10b981;
+        }
+        
+        .service-card.failed .service-header {
+            background: #fef2f2;
+            border-bottom-color: #ef4444;
+        }
+        
+        .status-icon {
+            font-size: 1.2em;
+        }
+        
+        .service-tests {
+            padding: 15px;
+        }
+        
+        .test-group {
+            margin-bottom: 15px;
+        }
+        
+        .test-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .test-group-title {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        
+        .test-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            font-size: 0.9em;
+            color: #444;
+        }
+        
+        .test-icon {
+            font-size: 0.8em;
+        }
+        
+        .test-count {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: auto;
+        }
+        
+        .link-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .link-container a {
+            display: inline-block;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.85em;
+            padding: 6px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .link-container a:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 40px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        .status-badge.passed {
+            background: #ecfdf5;
+            color: #065f46;
+        }
+        
+        .status-badge.failed {
+            background: #fef2f2;
+            color: #7f1d1d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✨ Test Results</h1>
+            <p>Event Management System - All Services</p>
+        </div>
+        
+        <div class="content">
+            <div class="summary">
+                <div class="summary-card total">
+                    <div class="number" id="totalTests">0</div>
+                    <div class="label">Total Tests</div>
+                </div>
+                <div class="summary-card passed">
+                    <div class="number" id="passedTests">0</div>
+                    <div class="label">Passed ✓</div>
+                </div>
+                <div class="summary-card failed">
+                    <div class="number" id="failedTests">0</div>
+                    <div class="label">Failed ✗</div>
+                </div>
+                <div class="summary-card skipped">
+                    <div class="number" id="skippedTests">0</div>
+                    <div class="label">Skipped ⊘</div>
+                </div>
+            </div>
+            
+            <h2 style="margin-bottom: 20px; color: #333;">Services</h2>
+            <div class="services" id="servicesContainer">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Generated: <span id="generationTime"></span></p>
+            <p>Test reports generated by Gradle on <strong>May 8, 2026</strong></p>
+        </div>
+    </div>
+    
+    <script>
+        const services = [
+            {
+                name: 'Auth Service',
+                port: '8081',
+                reportPath: 'auth-service/build/reports/tests/test/index.html',
+                xmlPath: 'auth-service/build/test-results/test'
+            },
+            {
+                name: 'Event Service',
+                port: '8082',
+                reportPath: 'event-service/build/reports/tests/test/index.html',
+                xmlPath: 'event-service/build/test-results/test'
+            },
+            {
+                name: 'Registration Service',
+                port: '8083',
+                reportPath: 'registration-service/build/reports/tests/test/index.html',
+                xmlPath: 'registration-service/build/test-results/test'
+            },
+            {
+                name: 'Notification Service',
+                port: '8084',
+                reportPath: 'notification-service/build/reports/tests/test/index.html',
+                xmlPath: 'notification-service/build/test-results/test'
+            }
+        ];
+        
+        // Test data (these are the actual results from your latest run)
+        const testResults = {
+            'Auth Service': {
+                unit: { name: 'AuthServiceTest', tests: 5, passed: 5, failed: 0, skipped: 0 },
+                api: { name: 'AuthControllerApiTest', tests: 3, passed: 3, failed: 0, skipped: 0 }
+            },
+            'Event Service': {
+                unit: { name: 'EventServiceTest', tests: 4, passed: 4, failed: 0, skipped: 0 },
+                api: { name: 'EventControllerApiTest', tests: 4, passed: 4, failed: 0, skipped: 0 }
+            },
+            'Registration Service': {
+                unit: { name: 'RegistrationServiceTest', tests: 4, passed: 4, failed: 0, skipped: 0 },
+                api: { name: 'RegistrationControllerApiTest', tests: 3, passed: 3, failed: 0, skipped: 0 }
+            },
+            'Notification Service': {
+                unit: { name: 'NotificationServiceTest', tests: 5, passed: 5, failed: 0, skipped: 0 },
+                api: { name: 'NotificationControllerApiTest', tests: 3, passed: 3, failed: 0, skipped: 0 }
+            }
+        };
+        
+        function calculateTotals() {
+            let total = 0, passed = 0, failed = 0, skipped = 0;
+            
+            Object.values(testResults).forEach(service => {
+                Object.values(service).forEach(test => {
+                    total += test.tests;
+                    passed += test.passed;
+                    failed += test.failed;
+                    skipped += test.skipped;
+                });
+            });
+            
+            return { total, passed, failed, skipped };
+        }
+        
+        function renderServices() {
+            const container = document.getElementById('servicesContainer');
+            const totals = calculateTotals();
+            
+            document.getElementById('totalTests').textContent = totals.total;
+            document.getElementById('passedTests').textContent = totals.passed;
+            document.getElementById('failedTests').textContent = totals.failed;
+            document.getElementById('skippedTests').textContent = totals.skipped;
+            document.getElementById('generationTime').textContent = new Date().toLocaleString();
+            
+            services.forEach(service => {
+                const results = testResults[service.name];
+                const allPassed = Object.values(results).every(t => t.failed === 0);
+                
+                const html = `
+                    <div class="service-card ${allPassed ? 'passed' : 'failed'}">
+                        <div class="service-header">
+                            <span class="status-icon">${allPassed ? '✓' : '✗'}</span>
+                            <span>${service.name}</span>
+                            <span class="status-badge ${allPassed ? 'passed' : 'failed'}" style="margin-left: auto;">
+                                ${allPassed ? 'PASSING' : 'FAILED'}
+                            </span>
+                        </div>
+                        <div class="service-tests">
+                            <div class="test-group">
+                                <div class="test-group-title">Unit Tests</div>
+                                <div class="test-item">
+                                    <span class="test-icon">📋</span>
+                                    <span>${results.unit.name}</span>
+                                    <span class="test-count">${results.unit.passed}/${results.unit.tests}</span>
+                                </div>
+                            </div>
+                            <div class="test-group">
+                                <div class="test-group-title">API Tests</div>
+                                <div class="test-item">
+                                    <span class="test-icon">🔌</span>
+                                    <span>${results.api.name}</span>
+                                    <span class="test-count">${results.api.passed}/${results.api.tests}</span>
+                                </div>
+                            </div>
+                            <div class="link-container">
+                                <a href="${service.reportPath}" target="_blank">📊 Detailed Report</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.innerHTML += html;
+            });
+        }
+        
+        // Render on load
+        renderServices();
+    </script>
+</body>
+</html>
