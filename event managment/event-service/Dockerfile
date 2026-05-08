@@ -1,17 +1,34 @@
-FROM gradle:9.4.1-jdk21 AS build
+# syntax=docker/dockerfile:1.7
+# Multi-stage build for Event Service
+FROM gradle:9.4-jdk21 AS builder
 
-WORKDIR /workspace
+WORKDIR /build
+ENV GRADLE_USER_HOME=/home/gradle/.gradle
 
-COPY . .
-RUN gradle :event-service:bootJar --no-daemon
-RUN set -eux; jar_file=$(find event-service/build/libs -maxdepth 1 -name '*.jar' ! -name '*-plain.jar' | head -n 1); cp "$jar_file" /tmp/app.jar
+# Copy root project files
+COPY settings.gradle build.gradle ./
+COPY gradle ./gradle
+COPY gradlew ./
 
+# Copy only event-service source code
+COPY event-service ./event-service
+
+# Ensure other project directories exist so the root `settings.gradle` can configure them
+RUN mkdir -p /build/auth-service /build/registration-service /build/notification-service /build/integration-tests
+
+# Build only the event-service using a shared Gradle cache
+RUN --mount=type=cache,id=gradle-cache,target=/home/gradle/.gradle,sharing=locked gradle :event-service:bootJar --no-daemon
+
+# Runtime stage
 FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-COPY --from=build /tmp/app.jar app.jar
+# Copy the built JAR from the builder stage
+COPY --from=builder /build/event-service/build/libs/*.jar app.jar
 
+# Expose the port
 EXPOSE 8082
 
+# Start the application
 ENTRYPOINT ["java", "-jar", "app.jar"]

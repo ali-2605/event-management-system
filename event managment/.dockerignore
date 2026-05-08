@@ -5,3 +5,13 @@ build
 .env
 *.iml
 out
+.gitignore
+*.log
+.DS_Store
+README.md
+docs
+compose*.yaml
+docker-compose.yml
+start.sh
+stop.sh
+logs.sh
