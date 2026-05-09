@@ -7,6 +7,23 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_provider.g.dart';
 
+String _extractErrorMessage(DioException error) {
+  final data = error.response?.data;
+
+  if (data is Map<String, dynamic>) {
+    final message = data['error'] ?? data['message'];
+    if (message is String && message.trim().isNotEmpty) {
+      return message;
+    }
+  }
+
+  if (error.response?.statusCode != null) {
+    return 'Request failed with status ${error.response!.statusCode}.';
+  }
+
+  return 'Unable to reach the backend. Please check the gateway and service logs.';
+}
+
 @riverpod
 class Auth extends _$Auth {
   final _storage = const FlutterSecureStorage();
@@ -50,9 +67,7 @@ class Auth extends _$Auth {
       state = AsyncValue.data(authResponse);
     } on DioException catch (e, stack) {
       if (!ref.mounted) return;
-      final message = e.response?.statusCode == 401
-          ? 'Invalid email or password.'
-          : 'An error occurred. Please try again.';
+      final message = _extractErrorMessage(e);
       state = AsyncValue.error(message, stack);
     } catch (e, stack) {
       if (!ref.mounted) return;
@@ -95,9 +110,7 @@ class Auth extends _$Auth {
       state = AsyncValue.data(authResponse);
     } on DioException catch (e, stack) {
       if (!ref.mounted) return;
-      final message = e.response?.statusCode == 409
-          ? 'This email is already registered.'
-          : 'Failed to register. Please check your connection.';
+      final message = _extractErrorMessage(e);
       state = AsyncValue.error(message, stack);
     } catch (e, stack) {
       if (!ref.mounted) return;

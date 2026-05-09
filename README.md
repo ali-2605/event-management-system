@@ -31,13 +31,23 @@ Useful commands:
 
 Clients should use the gateway at `http://localhost:8080`.
 
+The Flutter frontend is served separately on `http://localhost:3000` when started through Docker.
+
+To change the frontend API endpoint, edit `event managment/.env` and update `API_HOST` and `API_PORT`, then rebuild the frontend:
+
+```bash
+cd event\ managment
+docker compose down frontend
+docker rmi eventmanagment-frontend
+docker compose up --build -d frontend
+```
+
 ## Environment values
 
-Copy `.env.example` to `.env` if you want to customize ports, credentials, or service URLs.
-
-Default values:
+All configuration is in `event managment/.env`:
 
 ```text
+# Backend Services
 AUTH_PORT=8081
 EVENT_PORT=8082
 REGISTRATION_PORT=8083
@@ -51,6 +61,10 @@ POSTGRES_PASSWORD=postgres
 JWT_SECRET=SuperSecretSuperSecretSuperSecret123456
 JWT_EXPIRATION_DAYS=7
 SERVICE_TOKEN=SuperDuperServiceTokenKey
+
+# Frontend API
+API_HOST=localhost
+API_PORT=8080
 ```
 
 `JWT_SECRET` must be at least 32 bytes for HS256.
@@ -122,6 +136,25 @@ docker compose up --build
 # Terminal 2: Run integration tests
 ./gradlew :integration-tests:test
 ```
+
+## Frontend
+
+Run the frontend through Docker and open it in your browser at:
+
+```text
+http://localhost:3000
+```
+
+This frontend container serves the Flutter web build with Nginx, while the backend gateway remains on `http://localhost:8080`.
+
+If your browser is not running on the same machine as Docker, set API host before rebuilding:
+
+```bash
+cd event\ managment
+API_HOST=192.168.100.106 API_PORT=8080 docker compose up --build -d frontend
+```
+
+If the browser still uses an old API URL, clear cached site data (or unregister service worker) and hard refresh.
 
 Integration tests verify:
 - User authentication flows (register, login)

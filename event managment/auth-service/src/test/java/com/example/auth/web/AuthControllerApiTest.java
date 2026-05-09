@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.auth.service.AuthService;
+import com.example.auth.domain.Role;
 import com.example.auth.web.dto.AuthResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +72,8 @@ class AuthControllerApiTest {
 
     @Test
     void loginSuccessReturnsToken() throws Exception {
-        when(authService.login(any())).thenReturn(new AuthResponse("jwt-token"));
+        when(authService.login(any())).thenReturn(
+                new AuthResponse("jwt-token", "Test User", "test@example.com", Role.ATTENDEE));
 
         String request = """
                 {

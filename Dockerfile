@@ -1,20 +1,25 @@
 # Stage 1: Build the Flutter Web application
 FROM ghcr.io/cirruslabs/flutter:stable AS build
 
+# Backend API endpoint configuration (passed from .env via docker compose)
+ARG API_HOST=localhost
+ARG API_PORT=8080
+
 # Set the working directory
 WORKDIR /app
 
 # Copy the pubspec and fetch dependencies
-# Note: we copy pubspec.lock but it might be updated by pub get if it was old
 COPY pubspec.yaml pubspec.lock ./
 RUN flutter pub get
 
 # Copy the rest of the source code
 COPY . .
 
-# Build the application for web
-# This generates files in /app/build/web
-RUN flutter build web --release
+# Build the application for web and inject build-time defines
+# These --dart-define values are read by String.fromEnvironment as a fallback
+RUN flutter build web --release \
+	--dart-define=API_HOST=${API_HOST} \
+	--dart-define=API_PORT=${API_PORT}
 
 # Stage 2: Serve the application using Nginx
 FROM nginx:alpine
@@ -22,8 +27,6 @@ FROM nginx:alpine
 # Copy the build output from the previous stage to Nginx's web root
 COPY --from=build /app/build/web /usr/share/nginx/html
 
-# Expose port 80 (standard for HTTP)
 EXPOSE 80
 
-# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]

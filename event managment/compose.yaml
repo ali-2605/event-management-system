@@ -166,9 +166,12 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
+      args:
+        API_HOST: ${API_HOST:-localhost}
+        API_PORT: ${API_PORT:-8080}
     container_name: event-management-frontend
     ports:
-      - "67:67"
+      - "3000:80"
     depends_on:
       - auth-service
       - event-service

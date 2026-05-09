@@ -2,16 +2,23 @@ import 'package:dio/dio.dart';
 import 'package:event_management_system/features/auth/auth_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:event_management_system/core/runtime_config.dart';
 
 part 'dio_provider.g.dart';
 
 class ServiceUrls {
-  static const String host = '192.168.100.106';
+  static String get host =>
+      RuntimeConfig.loaded ? RuntimeConfig.apiHost : const String.fromEnvironment('API_HOST', defaultValue: 'localhost');
 
-  static const String auth = 'http://$host:8080';
-  static const String event = 'http://$host:8080';
-  static const String registration = 'http://$host:8080';
-  static const String notification = 'http://$host:8080';
+  static String get port =>
+      RuntimeConfig.loaded ? RuntimeConfig.apiPort : const String.fromEnvironment('API_PORT', defaultValue: '8080');
+
+  static String get gatewayBaseUrl => 'http://$host:$port';
+
+  static String get auth => gatewayBaseUrl;
+  static String get event => gatewayBaseUrl;
+  static String get registration => gatewayBaseUrl;
+  static String get notification => gatewayBaseUrl;
 }
 
 @riverpod
