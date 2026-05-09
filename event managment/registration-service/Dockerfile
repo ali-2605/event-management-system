@@ -1,34 +1,32 @@
-# syntax=docker/dockerfile:1.7
-# Multi-stage build for Registration Service
-FROM gradle:9.4-jdk21 AS builder
+FROM eclipse-temurin:21-jdk AS build
 
-WORKDIR /build
-ENV GRADLE_USER_HOME=/home/gradle/.gradle
+WORKDIR /workspace
+ENV GRADLE_USER_HOME=/root/.gradle
 
-# Copy root project files
-COPY settings.gradle build.gradle ./
+COPY gradlew settings.gradle build.gradle ./
 COPY gradle ./gradle
-COPY gradlew ./
-
-# Copy only registration-service source code
 COPY registration-service ./registration-service
 
-# Ensure other project directories exist so the root `settings.gradle` can configure them
-RUN mkdir -p /build/auth-service /build/event-service /build/notification-service /build/gateway /build/eureka-server /build/integration-tests
+# Gradle configures the full multi-project build, so the missing modules still
+# need placeholder directories even when this image only builds one service.
+RUN set -eux; \
+    chmod +x gradlew; \
+    for module in auth-service event-service notification-service gateway eureka-server integration-tests; do \
+        mkdir -p "$module"; \
+    done
 
-# Build only the registration-service using a shared Gradle cache
-RUN --mount=type=cache,id=gradle-cache,target=/home/gradle/.gradle,sharing=locked gradle :registration-service:bootJar --no-daemon
+RUN ./gradlew :registration-service:bootJar --no-daemon && \
+    cp /workspace/registration-service/build/libs/*.jar /workspace/app.jar
 
-# Runtime stage
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:21-jre AS runtime
 
+RUN useradd --system --create-home appuser
 WORKDIR /app
 
-# Copy the built JAR from the builder stage
-COPY --from=builder /build/registration-service/build/libs/*.jar app.jar
+COPY --from=build --chown=appuser:appuser /workspace/app.jar /app/app.jar
 
-# Expose the port
+USER appuser
+
 EXPOSE 8083
 
-# Start the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]

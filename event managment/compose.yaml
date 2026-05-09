@@ -1,189 +1,159 @@
-services:
-  # PostgreSQL Database
+name: event-management
+
+x-service-defaults: &service-defaults
+  restart: unless-stopped
+
+x-java-service: &java-service
+  <<: *service-defaults
+  networks:
+    - backend
+
+x-eureka-client-env: &eureka-client-env
+  EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+  EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+
+x-spring-service-env: &spring-service-env
+  <<: *eureka-client-env
+  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-event_management}
+  SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+  SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+  JWT_SECRET: ${JWT_SECRET:-SuperSecretSuperSecretSuperSecret123456}
+
+x-app-depends-on: &app-depends-on
   postgres:
+    condition: service_healthy
+  eureka-server:
+    condition: service_started
+
+x-gateway-depends-on: &gateway-depends-on
+  eureka-server:
+    condition: service_started
+  auth-service:
+    condition: service_started
+  event-service:
+    condition: service_started
+  registration-service:
+    condition: service_started
+  notification-service:
+    condition: service_started
+
+services:
+  postgres:
+    <<: *service-defaults
     image: postgres:16-alpine
-    container_name: event-management-db
+    networks:
+      - backend
     environment:
-      POSTGRES_DB: event_management
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-event_management}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
-      - "5433:5432"
+      - "${DB_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test:
+        - CMD-SHELL
+        - pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-event_management}
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - event-network
+      start_period: 10s
 
-  # Auth Service
-  auth-service:
-    build:
-      context: .
-      dockerfile: auth-service/Dockerfile
-    container_name: auth-service
-    environment:
-      SERVER_PORT: 8081
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/event_management
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
-      JWT_EXPIRATION_DAYS: 7
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
-      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      eureka-server:
-        condition: service_started
-    networks:
-      - event-network
-    restart: unless-stopped
-
-  # Event Service
-  event-service:
-    build:
-      context: .
-      dockerfile: event-service/Dockerfile
-    container_name: event-service
-    environment:
-      SERVER_PORT: 8082
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/event_management
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
-      SERVICE_TOKEN: ${SERVICE_TOKEN:-service-secret-key}
-      REGISTRATION_SERVICE_URL: http://registration-service:8083
-      NOTIFICATION_SERVICE_URL: http://notification-service:8084
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
-      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      eureka-server:
-        condition: service_started
-    networks:
-      - event-network
-    restart: unless-stopped
-
-  # Registration Service
-  registration-service:
-    build:
-      context: .
-      dockerfile: registration-service/Dockerfile
-    container_name: registration-service
-    environment:
-      SERVER_PORT: 8083
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/event_management
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
-      SERVICE_TOKEN: ${SERVICE_TOKEN:-service-secret-key}
-      EVENT_SERVICE_URL: http://event-service:8082
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
-      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      eureka-server:
-        condition: service_started
-    networks:
-      - event-network
-    restart: unless-stopped
-
-  # Notification Service
-  notification-service:
-    build:
-      context: .
-      dockerfile: notification-service/Dockerfile
-    container_name: notification-service
-    environment:
-      SERVER_PORT: 8084
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/event_management
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
-      SERVICE_TOKEN: ${SERVICE_TOKEN:-service-secret-key}
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
-      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      eureka-server:
-        condition: service_started
-    networks:
-      - event-network
-    restart: unless-stopped
-
-  # Eureka Server
   eureka-server:
+    <<: *java-service
     build:
       context: .
       dockerfile: eureka-server/Dockerfile
-    container_name: eureka-server
     ports:
       - "8761:8761"
     environment:
       SERVER_PORT: 8761
       EUREKA_CLIENT_REGISTERWITHEUREKA: "false"
       EUREKA_CLIENT_FETCHREGISTRY: "false"
-    networks:
-      - event-network
-    restart: unless-stopped
 
-  # API Gateway
+  auth-service:
+    <<: *java-service
+    build:
+      context: .
+      dockerfile: auth-service/Dockerfile
+    depends_on: *app-depends-on
+    environment:
+      <<: *spring-service-env
+      SERVER_PORT: 8081
+      JWT_EXPIRATION_DAYS: ${JWT_EXPIRATION_DAYS:-7}
+
+  event-service:
+    <<: *java-service
+    build:
+      context: .
+      dockerfile: event-service/Dockerfile
+    depends_on: *app-depends-on
+    environment:
+      <<: *spring-service-env
+      SERVER_PORT: 8082
+      SERVICE_TOKEN: ${SERVICE_TOKEN:-SuperDuperServiceTokenKey}
+      REGISTRATION_SERVICE_URL: http://registration-service:8083
+      NOTIFICATION_SERVICE_URL: http://notification-service:8084
+
+  registration-service:
+    <<: *java-service
+    build:
+      context: .
+      dockerfile: registration-service/Dockerfile
+    depends_on: *app-depends-on
+    environment:
+      <<: *spring-service-env
+      SERVER_PORT: 8083
+      SERVICE_TOKEN: ${SERVICE_TOKEN:-SuperDuperServiceTokenKey}
+      EVENT_SERVICE_URL: http://event-service:8082
+
+  notification-service:
+    <<: *java-service
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    depends_on: *app-depends-on
+    environment:
+      <<: *spring-service-env
+      SERVER_PORT: 8084
+      SERVICE_TOKEN: ${SERVICE_TOKEN:-SuperDuperServiceTokenKey}
+
   gateway:
+    <<: *service-defaults
     build:
       context: .
       dockerfile: gateway/Dockerfile
-    container_name: gateway
     ports:
       - "8080:8080"
+    depends_on: *gateway-depends-on
     environment:
+      <<: *eureka-client-env
       SERVER_PORT: 8080
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
-      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
-    depends_on:
-      eureka-server:
-        condition: service_started
-      auth-service:
-        condition: service_started
-      event-service:
-        condition: service_started
-      registration-service:
-        condition: service_started
-      notification-service:
-        condition: service_started
     networks:
-      - event-network
-    restart: unless-stopped
+      - backend
+      - edge
 
-  # Flutter Frontend
   frontend:
+    <<: *service-defaults
     build:
-      context: ..
+      context: ../frontend
       dockerfile: Dockerfile
       args:
         API_HOST: ${API_HOST:-localhost}
         API_PORT: ${API_PORT:-8080}
-    container_name: event-management-frontend
     ports:
       - "3000:80"
     depends_on:
-      - auth-service
-      - event-service
-      - registration-service
-      - notification-service
+      gateway:
+        condition: service_started
     networks:
-      - event-network
+      - edge
 
 volumes:
   postgres_data:
-    driver: local
 
 networks:
-  event-network:
-    driver: bridge
+  backend:
+    internal: true
+  edge:
