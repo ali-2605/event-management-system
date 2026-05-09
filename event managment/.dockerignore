@@ -11,7 +11,7 @@ out
 README.md
 docs
 compose*.yaml
-docker-compose.yml
+compose.yaml
 start.sh
 stop.sh
 logs.sh

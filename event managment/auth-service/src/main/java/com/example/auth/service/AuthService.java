@@ -40,7 +40,8 @@ public class AuthService {
                 role
         );
         userRepository.save(user);
-        return new AuthResponse(jwtService.generateToken(user.getId(), role));
+        String token = jwtService.generateToken(user.getId(), role);
+        return new AuthResponse(token, user.getName(), user.getEmail(), user.getRole());
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -51,6 +52,7 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password.");
         }
 
-        return new AuthResponse(jwtService.generateToken(user.getId(), user.getRole()));
+        String token = jwtService.generateToken(user.getId(), user.getRole());
+        return new AuthResponse(token, user.getName(), user.getEmail(), user.getRole());
     }
 }

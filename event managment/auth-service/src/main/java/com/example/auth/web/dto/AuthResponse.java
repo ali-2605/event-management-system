@@ -1,4 +1,11 @@
 package com.example.auth.web.dto;
 
-public record AuthResponse(String token) {
+import com.example.auth.domain.Role;
+
+public record AuthResponse(
+        String token,
+        String name,
+        String email,
+        Role role
+) {
 }
