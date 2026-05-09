@@ -553,7 +553,7 @@ as UserRole,
 /// @nodoc
 mixin _$AuthResponse {
 
- String get token;
+ String get token; String get name; String get email; UserRole get role;
 /// Create a copy of AuthResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -566,16 +566,16 @@ $AuthResponseCopyWith<AuthResponse> get copyWith => _$AuthResponseCopyWithImpl<A
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthResponse&&(identical(other.token, token) || other.token == token));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthResponse&&(identical(other.token, token) || other.token == token)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.role, role) || other.role == role));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,token);
+int get hashCode => Object.hash(runtimeType,token,name,email,role);
 
 @override
 String toString() {
-  return 'AuthResponse(token: $token)';
+  return 'AuthResponse(token: $token, name: $name, email: $email, role: $role)';
 }
 
 
@@ -586,7 +586,7 @@ abstract mixin class $AuthResponseCopyWith<$Res>  {
   factory $AuthResponseCopyWith(AuthResponse value, $Res Function(AuthResponse) _then) = _$AuthResponseCopyWithImpl;
 @useResult
 $Res call({
- String token
+ String token, String name, String email, UserRole role
 });
 
 
@@ -603,10 +603,13 @@ class _$AuthResponseCopyWithImpl<$Res>
 
 /// Create a copy of AuthResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? token = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? token = null,Object? name = null,Object? email = null,Object? role = null,}) {
   return _then(_self.copyWith(
 token: null == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
-as String,
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as UserRole,
   ));
 }
 
@@ -691,10 +694,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String token)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String token,  String name,  String email,  UserRole role)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthResponse() when $default != null:
-return $default(_that.token);case _:
+return $default(_that.token,_that.name,_that.email,_that.role);case _:
   return orElse();
 
 }
@@ -712,10 +715,10 @@ return $default(_that.token);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String token)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String token,  String name,  String email,  UserRole role)  $default,) {final _that = this;
 switch (_that) {
 case _AuthResponse():
-return $default(_that.token);case _:
+return $default(_that.token,_that.name,_that.email,_that.role);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -732,10 +735,10 @@ return $default(_that.token);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String token)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String token,  String name,  String email,  UserRole role)?  $default,) {final _that = this;
 switch (_that) {
 case _AuthResponse() when $default != null:
-return $default(_that.token);case _:
+return $default(_that.token,_that.name,_that.email,_that.role);case _:
   return null;
 
 }
@@ -747,10 +750,13 @@ return $default(_that.token);case _:
 @JsonSerializable()
 
 class _AuthResponse implements AuthResponse {
-  const _AuthResponse({required this.token});
+  const _AuthResponse({required this.token, required this.name, required this.email, required this.role});
   factory _AuthResponse.fromJson(Map<String, dynamic> json) => _$AuthResponseFromJson(json);
 
 @override final  String token;
+@override final  String name;
+@override final  String email;
+@override final  UserRole role;
 
 /// Create a copy of AuthResponse
 /// with the given fields replaced by the non-null parameter values.
@@ -765,16 +771,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthResponse&&(identical(other.token, token) || other.token == token));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthResponse&&(identical(other.token, token) || other.token == token)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.role, role) || other.role == role));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,token);
+int get hashCode => Object.hash(runtimeType,token,name,email,role);
 
 @override
 String toString() {
-  return 'AuthResponse(token: $token)';
+  return 'AuthResponse(token: $token, name: $name, email: $email, role: $role)';
 }
 
 
@@ -785,7 +791,7 @@ abstract mixin class _$AuthResponseCopyWith<$Res> implements $AuthResponseCopyWi
   factory _$AuthResponseCopyWith(_AuthResponse value, $Res Function(_AuthResponse) _then) = __$AuthResponseCopyWithImpl;
 @override @useResult
 $Res call({
- String token
+ String token, String name, String email, UserRole role
 });
 
 
@@ -802,10 +808,13 @@ class __$AuthResponseCopyWithImpl<$Res>
 
 /// Create a copy of AuthResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? token = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? token = null,Object? name = null,Object? email = null,Object? role = null,}) {
   return _then(_AuthResponse(
 token: null == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
-as String,
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as UserRole,
   ));
 }
 

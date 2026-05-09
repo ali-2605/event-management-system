@@ -12,7 +12,7 @@ part of 'auth_provider.dart';
 @ProviderFor(Auth)
 final authProvider = AuthProvider._();
 
-final class AuthProvider extends $AsyncNotifierProvider<Auth, String?> {
+final class AuthProvider extends $AsyncNotifierProvider<Auth, AuthResponse?> {
   AuthProvider._()
     : super(
         from: null,
@@ -32,19 +32,19 @@ final class AuthProvider extends $AsyncNotifierProvider<Auth, String?> {
   Auth create() => Auth();
 }
 
-String _$authHash() => r'e14fa242e4b2e124e9a486aa03ce65c62356d35d';
+String _$authHash() => r'7f4029c34a286413826fbbf4ceb7e6d39214044c';
 
-abstract class _$Auth extends $AsyncNotifier<String?> {
-  FutureOr<String?> build();
+abstract class _$Auth extends $AsyncNotifier<AuthResponse?> {
+  FutureOr<AuthResponse?> build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<String?>, String?>;
+    final ref = this.ref as $Ref<AsyncValue<AuthResponse?>, AuthResponse?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<String?>, String?>,
-              AsyncValue<String?>,
+              AnyNotifier<AsyncValue<AuthResponse?>, AuthResponse?>,
+              AsyncValue<AuthResponse?>,
               Object?,
               Object?
             >;

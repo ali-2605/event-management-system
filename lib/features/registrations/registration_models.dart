@@ -4,8 +4,8 @@ part 'registration_models.freezed.dart';
 part 'registration_models.g.dart';
 
 enum RegistrationStatus {
-  @JsonValue('REGISTERED')
-  registered,
+  @JsonValue('ACTIVE')
+  active,
   @JsonValue('CANCELED')
   canceled,
 }

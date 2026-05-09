@@ -31,6 +31,6 @@ Map<String, dynamic> _$NotificationResponseToJson(
 };
 
 const _$NotificationTypeEnumMap = {
-  NotificationType.eventUpdate: 'EVENT_UPDATE',
-  NotificationType.eventCancelation: 'EVENT_CANCELATION',
+  NotificationType.updated: 'UPDATED',
+  NotificationType.canceled: 'CANCELED',
 };

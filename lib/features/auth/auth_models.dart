@@ -36,7 +36,12 @@ abstract class RegisterRequest with _$RegisterRequest {
 
 @freezed
 abstract class AuthResponse with _$AuthResponse {
-  const factory AuthResponse({required String token}) = _AuthResponse;
+  const factory AuthResponse({
+    required String token,
+    required String name,
+    required String email,
+    required UserRole role,
+  }) = _AuthResponse;
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) =>
       _$AuthResponseFromJson(json);

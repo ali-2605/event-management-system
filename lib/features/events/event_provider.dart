@@ -23,9 +23,9 @@ class Events extends _$Events {
       '${ServiceUrls.event}/api/events',
       queryParameters: {
         if (mine != null) 'mine': mine,
-        if (status != null) 'status': status.name,
-        if (from != null) 'from': from.toIso8601String(),
-        if (to != null) 'to': to.toIso8601String(),
+        if (status != null) 'status': status.name.toUpperCase(),
+        if (from != null) 'from': from.toUtc().toIso8601String(),
+        if (to != null) 'to': to.toUtc().toIso8601String(),
         if (sort != null) 'sort': sort,
       },
     );
@@ -36,16 +36,25 @@ class Events extends _$Events {
 
   Future<void> createEvent(CreateEventRequest request) async {
     final dio = ref.read(dioProvider);
-    await dio.post('${ServiceUrls.event}/api/events', data: request.toJson());
+    final json = request.toJson();
+    json['startsAt'] = request.startsAt.toUtc().toIso8601String();
+    json['endsAt'] = request.endsAt.toUtc().toIso8601String();
+
+    await dio.post('${ServiceUrls.event}/api/events', data: json);
     ref.invalidateSelf();
   }
 
   Future<void> updateEvent(String eventId, UpdateEventRequest request) async {
     final dio = ref.read(dioProvider);
-    await dio.put(
-      '${ServiceUrls.event}/api/events/$eventId',
-      data: request.toJson(),
-    );
+    final json = request.toJson();
+    if (request.startsAt != null) {
+      json['startsAt'] = request.startsAt!.toUtc().toIso8601String();
+    }
+    if (request.endsAt != null) {
+      json['endsAt'] = request.endsAt!.toUtc().toIso8601String();
+    }
+
+    await dio.put('${ServiceUrls.event}/api/events/$eventId', data: json);
     ref.invalidateSelf();
   }
 
@@ -61,4 +70,19 @@ Future<EventResponse> eventDetails(Ref ref, String eventId) async {
   final dio = ref.read(dioProvider);
   final response = await dio.get('${ServiceUrls.event}/api/events/$eventId');
   return EventResponse.fromJson(response.data);
+}
+
+@riverpod
+class MyEvents extends _$MyEvents {
+  @override
+  FutureOr<List<EventResponse>> build() async {
+    return ref.watch(eventsProvider.notifier).fetchEvents(mine: true);
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(
+      () => ref.read(eventsProvider.notifier).fetchEvents(mine: true),
+    );
+  }
 }

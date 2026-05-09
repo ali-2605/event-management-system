@@ -37,7 +37,17 @@ const _$UserRoleEnumMap = {
 };
 
 _AuthResponse _$AuthResponseFromJson(Map<String, dynamic> json) =>
-    _AuthResponse(token: json['token'] as String);
+    _AuthResponse(
+      token: json['token'] as String,
+      name: json['name'] as String,
+      email: json['email'] as String,
+      role: $enumDecode(_$UserRoleEnumMap, json['role']),
+    );
 
 Map<String, dynamic> _$AuthResponseToJson(_AuthResponse instance) =>
-    <String, dynamic>{'token': instance.token};
+    <String, dynamic>{
+      'token': instance.token,
+      'name': instance.name,
+      'email': instance.email,
+      'role': _$UserRoleEnumMap[instance.role]!,
+    };

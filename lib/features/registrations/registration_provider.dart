@@ -8,7 +8,15 @@ part 'registration_provider.g.dart';
 class Registrations extends _$Registrations {
   @override
   FutureOr<List<RegistrationResponse>> build() async {
-    return await fetchMyRegistrations();
+    // Keep alive to prevent disposal during async operations
+    final link = ref.keepAlive();
+
+    try {
+      return await fetchMyRegistrations();
+    } finally {
+      // Allow disposal after initial fetch
+      link.close();
+    }
   }
 
   Future<List<RegistrationResponse>> fetchMyRegistrations() async {
@@ -26,7 +34,11 @@ class Registrations extends _$Registrations {
       '${ServiceUrls.registration}/api/registrations',
       data: CreateRegistrationRequest(eventId: eventId).toJson(),
     );
-    ref.invalidateSelf();
+
+    // Check if provider is still active before invalidating
+    if (ref.mounted) {
+      ref.invalidateSelf();
+    }
   }
 
   Future<void> cancelRegistration(String registrationId) async {
@@ -34,6 +46,22 @@ class Registrations extends _$Registrations {
     await dio.delete(
       '${ServiceUrls.registration}/api/registrations/$registrationId',
     );
-    ref.invalidateSelf();
+
+    if (ref.mounted) {
+      ref.invalidateSelf();
+    }
   }
+}
+
+@riverpod
+Future<List<RegistrationResponse>> eventRegistrations(
+  Ref ref,
+  String eventId,
+) async {
+  final dio = ref.read(dioProvider);
+  final response = await dio.get(
+    '${ServiceUrls.registration}/api/registrations/event/$eventId',
+  );
+  final List<dynamic> data = response.data;
+  return data.map((e) => RegistrationResponse.fromJson(e)).toList();
 }

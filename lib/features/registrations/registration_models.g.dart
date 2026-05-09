@@ -31,7 +31,7 @@ Map<String, dynamic> _$RegistrationResponseToJson(
 };
 
 const _$RegistrationStatusEnumMap = {
-  RegistrationStatus.registered: 'REGISTERED',
+  RegistrationStatus.active: 'ACTIVE',
   RegistrationStatus.canceled: 'CANCELED',
 };
 

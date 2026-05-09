@@ -33,7 +33,7 @@ final class EventsProvider
   Events create() => Events();
 }
 
-String _$eventsHash() => r'5f588e87ba1734a821281ea3340435eaeffd6cbd';
+String _$eventsHash() => r'9565327227453cbbc65824a20d8f53f17c966756';
 
 abstract class _$Events extends $AsyncNotifier<List<EventResponse>> {
   FutureOr<List<EventResponse>> build();
@@ -127,4 +127,49 @@ final class EventDetailsFamily extends $Family
 
   @override
   String toString() => r'eventDetailsProvider';
+}
+
+@ProviderFor(MyEvents)
+final myEventsProvider = MyEventsProvider._();
+
+final class MyEventsProvider
+    extends $AsyncNotifierProvider<MyEvents, List<EventResponse>> {
+  MyEventsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'myEventsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$myEventsHash();
+
+  @$internal
+  @override
+  MyEvents create() => MyEvents();
+}
+
+String _$myEventsHash() => r'9a19f453c6a5fa0b7ae0edd53a72232ac7828e6d';
+
+abstract class _$MyEvents extends $AsyncNotifier<List<EventResponse>> {
+  FutureOr<List<EventResponse>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref as $Ref<AsyncValue<List<EventResponse>>, List<EventResponse>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<EventResponse>>, List<EventResponse>>,
+              AsyncValue<List<EventResponse>>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
 }

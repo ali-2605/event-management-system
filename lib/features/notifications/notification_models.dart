@@ -4,10 +4,10 @@ part 'notification_models.freezed.dart';
 part 'notification_models.g.dart';
 
 enum NotificationType {
-  @JsonValue('EVENT_UPDATE')
-  eventUpdate,
-  @JsonValue('EVENT_CANCELATION')
-  eventCancelation,
+  @JsonValue('UPDATED')
+  updated,
+  @JsonValue('CANCELED')
+  canceled,
 }
 
 @freezed
