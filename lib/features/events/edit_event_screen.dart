@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+import 'package:event_management_system/core/error_extractor.dart';
 import 'package:event_management_system/features/events/event_models.dart';
 import 'package:event_management_system/features/events/event_provider.dart';
 import 'package:flutter/material.dart';
@@ -132,9 +134,12 @@ class EditEventScreen extends HookConsumerWidget {
                         }
                       } catch (e) {
                         if (context.mounted) {
+                          final errorMessage = e is DioException
+                              ? extractErrorMessage(e)
+                              : 'Failed to update event';
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Error: $e'),
+                              content: Text(errorMessage),
                               backgroundColor: Colors.red,
                             ),
                           );

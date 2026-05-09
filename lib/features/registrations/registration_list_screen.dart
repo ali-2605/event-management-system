@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+import 'package:event_management_system/core/error_extractor.dart';
 import 'package:event_management_system/features/events/event_provider.dart';
 import 'package:event_management_system/features/registrations/registration_models.dart';
 import 'package:event_management_system/features/registrations/registration_provider.dart';
@@ -140,11 +142,34 @@ class TicketCard extends ConsumerWidget {
                             TextButton(
                               onPressed: () async {
                                 Navigator.pop(context);
-                                await ref
-                                    .read(registrationsProvider.notifier)
-                                    .cancelRegistration(
-                                      registration.registrationId,
+                                try {
+                                  await ref
+                                      .read(registrationsProvider.notifier)
+                                      .cancelRegistration(
+                                        registration.registrationId,
+                                      );
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content:
+                                            Text('Ticket canceled successfully'),
+                                        backgroundColor: Colors.green,
+                                      ),
                                     );
+                                  }
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    final errorMessage = e is DioException
+                                        ? extractErrorMessage(e)
+                                        : 'Failed to cancel ticket';
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(errorMessage),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                }
                               },
                               child: const Text('Yes, cancel'),
                             ),

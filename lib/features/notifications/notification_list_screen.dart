@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+import 'package:event_management_system/core/error_extractor.dart';
 import 'package:event_management_system/features/notifications/notification_models.dart';
 import 'package:event_management_system/features/notifications/notification_provider.dart';
 import 'package:flutter/material.dart';
@@ -102,9 +104,23 @@ class NotificationTile extends ConsumerWidget {
               ),
         onTap: () {
           if (!notification.read) {
-            ref
-                .read(notificationsProvider.notifier)
-                .toggleRead(notification.notificationId);
+            try {
+              ref
+                  .read(notificationsProvider.notifier)
+                  .toggleRead(notification.notificationId);
+            } catch (e) {
+              if (context.mounted) {
+                final errorMessage = e is DioException
+                    ? extractErrorMessage(e)
+                    : 'Failed to mark as read';
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(errorMessage),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            }
           }
         },
       ),

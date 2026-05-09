@@ -9,19 +9,10 @@ part 'auth_provider.g.dart';
 
 String _extractErrorMessage(DioException error) {
   final data = error.response?.data;
-
-  if (data is Map<String, dynamic>) {
-    final message = data['error'] ?? data['message'];
-    if (message is String && message.trim().isNotEmpty) {
-      return message;
-    }
+  if (data is Map<String, dynamic> && data['error'] is String) {
+    return data['error'];
   }
-
-  if (error.response?.statusCode != null) {
-    return 'Request failed with status ${error.response!.statusCode}.';
-  }
-
-  return 'Unable to reach the backend. Please check the gateway and service logs.';
+  return error.message ?? 'An error occurred.';
 }
 
 @riverpod

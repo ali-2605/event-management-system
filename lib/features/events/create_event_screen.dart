@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+import 'package:event_management_system/core/error_extractor.dart';
 import 'package:event_management_system/features/events/event_models.dart';
 import 'package:event_management_system/features/events/event_provider.dart';
 import 'package:flutter/material.dart';
@@ -125,9 +127,12 @@ class CreateEventScreen extends HookConsumerWidget {
                         }
                       } catch (e) {
                         if (context.mounted) {
+                          final errorMessage = e is DioException
+                              ? extractErrorMessage(e)
+                              : 'Failed to create event';
                           ScaffoldMessenger.of(
                             context,
-                          ).showSnackBar(SnackBar(content: Text('Error: $e')));
+                          ).showSnackBar(SnackBar(content: Text(errorMessage)));
                         }
                       } finally {
                         isLoading.value = false;

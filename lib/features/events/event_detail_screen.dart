@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+import 'package:event_management_system/core/error_extractor.dart';
 import 'package:event_management_system/features/auth/auth_models.dart';
 import 'package:event_management_system/features/auth/auth_provider.dart';
 import 'package:event_management_system/features/events/edit_event_screen.dart';
@@ -97,11 +99,12 @@ class EventDetailScreen extends ConsumerWidget {
               }
             } catch (e) {
               if (context.mounted) {
+                final errorMessage = e is DioException
+                    ? extractErrorMessage(e)
+                    : 'Failed to register. Please try again.';
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Failed to register. Please check if the event is full.',
-                    ),
+                  SnackBar(
+                    content: Text(errorMessage),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -145,9 +148,32 @@ class EventDetailScreen extends ConsumerWidget {
                   } else if (val == 2) {
                     final confirmed = await _showCancelDialog(context);
                     if (confirmed == true) {
-                      await ref
-                          .read(eventsProvider.notifier)
-                          .cancelEvent(event.eventId);
+                      try {
+                        await ref
+                            .read(eventsProvider.notifier)
+                            .cancelEvent(event.eventId);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Event canceled successfully'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                          Navigator.of(context).pop();
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          final errorMessage = e is DioException
+                              ? extractErrorMessage(e)
+                              : 'Failed to cancel event';
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(errorMessage),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
                     }
                   }
                 },
