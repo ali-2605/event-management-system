@@ -110,6 +110,22 @@ services:
       - event-network
     restart: unless-stopped
 
+  # Flutter Frontend
+  frontend:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: event-management-frontend
+    ports:
+      - "67:67"
+    depends_on:
+      - auth-service
+      - event-service
+      - registration-service
+      - notification-service
+    networks:
+      - event-network
+
 volumes:
   postgres_data:
     driver: local
