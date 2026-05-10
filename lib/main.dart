@@ -23,12 +23,10 @@ class MyApp extends ConsumerWidget {
       darkTheme: AppTheme.dark,
       home: authState.when(
         data: (user) => user == null ? const LoginScreen() : const MainScreen(),
-        // Show a full-screen loader only on the initial app launch check,
-        // not during login/register attempts (those show inline loading)
+        
         loading: () =>
             const Scaffold(body: Center(child: CircularProgressIndicator())),
-        // ✅ Error means auth failed — keep user on LoginScreen,
-        // the screen itself already shows the inline error banner
+       
         error: (err, stack) => const LoginScreen(),
       ),
     );
