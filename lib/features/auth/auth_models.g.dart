@@ -1,10 +1,6 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'auth_models.dart';
 
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
 
 _LoginRequest _$LoginRequestFromJson(Map<String, dynamic> json) =>
     _LoginRequest(
