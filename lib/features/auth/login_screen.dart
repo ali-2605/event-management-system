@@ -17,9 +17,7 @@ class LoginScreen extends HookConsumerWidget {
     final didSubmit = useRef(false);
     final localError = useState<String?>(null);
 
-    // Derive the displayed error from EITHER the local state (set by listener)
-    // OR directly from authState.error (catches the case where LoginScreen
-    // is freshly mounted while provider is already in error state)
+   
     final displayedError =
         localError.value ??
         (authState.hasError ? authState.error.toString() : null);
