@@ -1,13 +1,7 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'event_provider.dart';
 
-// **************************************************************************
-// RiverpodGenerator
-// **************************************************************************
 
-// GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: type=lint, type=warning
 
 @ProviderFor(Events)
 final eventsProvider = EventsProvider._();
