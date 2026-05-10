@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import com.example.notification.data.NotificationRepository;
 import com.example.notification.domain.Notification;
 import com.example.notification.domain.NotificationType;
+import com.example.notification.pubsub.NotificationPublisher;
 import com.example.notification.security.AuthenticatedUser;
 import com.example.notification.security.UserRole;
 import com.example.notification.web.dto.NotifyAttendeesRequest;
@@ -27,6 +28,9 @@ class NotificationServiceTest {
 
     @Mock
     private NotificationRepository notificationRepository;
+
+    @Mock
+    private NotificationPublisher notificationPublisher;
 
     @InjectMocks
     private NotificationService notificationService;

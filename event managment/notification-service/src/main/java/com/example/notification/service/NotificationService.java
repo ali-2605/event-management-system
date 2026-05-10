@@ -2,9 +2,10 @@ package com.example.notification.service;
 
 import com.example.notification.data.NotificationRepository;
 import com.example.notification.domain.Notification;
-import com.example.notification.domain.NotificationType;
 import com.example.notification.security.AuthenticatedUser;
 import com.example.notification.security.UserRole;
+import com.example.notification.pubsub.NotificationEvent;
+import com.example.notification.pubsub.NotificationPublisher;
 import com.example.notification.web.dto.NotificationResponse;
 import com.example.notification.web.dto.NotifyAttendeesRequest;
 import java.time.OffsetDateTime;
@@ -23,9 +24,11 @@ public class NotificationService {
     private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("createdAt");
 
     private final NotificationRepository notificationRepository;
+    private final NotificationPublisher notificationPublisher;
 
-    public NotificationService(NotificationRepository notificationRepository) {
+    public NotificationService(NotificationRepository notificationRepository, NotificationPublisher notificationPublisher) {
         this.notificationRepository = notificationRepository;
+        this.notificationPublisher = notificationPublisher;
     }
 
     public List<NotificationResponse> getNotifications(
@@ -73,18 +76,14 @@ public class NotificationService {
         if (request == null || request.attendeeIds() == null || request.attendeeIds().isEmpty()) {
             return 0;
         }
-        NotificationType type = request.type();
-        List<Notification> notifications = request.attendeeIds().stream()
-                .map(attendeeId -> new Notification(
-                        UUID.randomUUID(),
-                        attendeeId,
-                        request.eventId(),
-                        request.message(),
-                        type
-                ))
-                .toList();
-        notificationRepository.saveAll(notifications);
-        return notifications.size();
+        NotificationEvent event = new NotificationEvent(
+            request.eventId(),
+            request.attendeeIds(),
+            request.type(),
+            request.message()
+        );
+        notificationPublisher.publish(event);
+        return event.attendeeIds().size();
     }
 
     private Specification<Notification> attendeeSpec(UUID attendeeId) {
