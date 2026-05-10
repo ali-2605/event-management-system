@@ -1,10 +1,6 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'event_models.dart';
 
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
 
 _EventResponse _$EventResponseFromJson(Map<String, dynamic> json) =>
     _EventResponse(
