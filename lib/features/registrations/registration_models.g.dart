@@ -1,10 +1,7 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'registration_models.dart';
 
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
+
 
 _RegistrationResponse _$RegistrationResponseFromJson(
   Map<String, dynamic> json,
