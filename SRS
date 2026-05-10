@@ -1,0 +1,625 @@
+# Software Requirements Specification (SRS)
+
+# Event Management System Backend
+
+**Microservices-Based Architecture using Spring Boot and Spring Cloud**
+
+---
+
+# 1. Introduction
+
+## 1.1 Purpose
+
+This Software Requirements Specification (SRS) defines the functional and non-functional requirements for the backend of the Event Management System. The system is designed using a microservices architecture to provide scalable, maintainable, and modular event management capabilities.
+
+The backend supports:
+
+* User authentication and authorization
+* Event creation and management
+* Attendee registration
+* Notification delivery
+* Secure inter-service communication
+* Gateway-based API routing
+* Service discovery
+
+This document serves as a reference for developers, testers, maintainers, and evaluators.
+
+---
+
+# 1.2 Scope
+
+The backend system provides REST APIs for managing events and attendees in a distributed environment. The system is implemented using Spring Boot microservices and deployed using Docker containers.
+
+The platform supports:
+
+* Organizer event management
+* Attendee registrations
+* JWT authentication
+* Notification management
+* Service discovery and routing
+* AOP-based observability
+* Validation and business rule enforcement
+
+The system is intended for educational and demonstration purposes while following enterprise backend design principles.
+
+---
+
+# 1.3 Definitions and Acronyms
+
+| Term    | Description                       |
+| ------- | --------------------------------- |
+| API     | Application Programming Interface |
+| JWT     | JSON Web Token                    |
+| DTO     | Data Transfer Object              |
+| AOP     | Aspect Oriented Programming       |
+| OCL     | Object Constraint Language        |
+| REST    | Representational State Transfer   |
+| Eureka  | Netflix service discovery server  |
+| Gateway | Spring Cloud Gateway              |
+| UUID    | Universally Unique Identifier     |
+
+---
+
+# 1.4 References
+
+* Spring Boot Documentation
+* Spring Cloud Documentation
+* Docker Documentation
+* Jakarta Bean Validation Documentation
+* PostgreSQL Documentation
+
+---
+
+# 2. Overall Description
+
+## 2.1 Product Perspective
+
+The system is a distributed backend application composed of independently deployable microservices connected through a gateway and service discovery mechanism.
+
+Architecture style:
+
+* Microservices Architecture
+* RESTful APIs
+* Stateless Authentication
+* Containerized Deployment
+
+---
+
+## 2.2 System Architecture
+
+### Core Components
+
+| Component            | Responsibility                        |
+| -------------------- | ------------------------------------- |
+| API Gateway          | External request routing              |
+| Eureka Server        | Service discovery                     |
+| Auth Service         | Authentication and JWT management     |
+| Event Service        | Event lifecycle management            |
+| Registration Service | Registration handling                 |
+| Notification Service | Notification creation and persistence |
+| PostgreSQL           | Data persistence                      |
+
+---
+
+## 2.3 Runtime Topology
+
+* All services run within Docker containers.
+* Services communicate through REST APIs.
+* Eureka dynamically registers services.
+* API Gateway routes external requests.
+* PostgreSQL serves as the shared database engine.
+
+---
+
+## 2.4 User Classes
+
+| User Type      | Description                         |
+| -------------- | ----------------------------------- |
+| Organizer      | Creates and manages events          |
+| Attendee       | Registers for events                |
+| Service Client | Internal microservice communication |
+
+---
+
+## 2.5 Operating Environment
+
+| Technology     | Version/Purpose               |
+| -------------- | ----------------------------- |
+| Java           | JDK 17+                       |
+| Spring Boot    | Backend framework             |
+| Spring Cloud   | Gateway and service discovery |
+| PostgreSQL     | Relational database           |
+| Docker         | Containerization              |
+| Docker Compose | Multi-container orchestration |
+
+---
+
+# 3. Functional Requirements
+
+# 3.1 Authentication Service
+
+## Description
+
+Handles user authentication and authorization.
+
+---
+
+## Functional Requirements
+
+### FR-AUTH-1: User Registration
+
+The system shall allow users to create accounts using:
+
+* Name
+* Email
+* Password
+* Role
+
+### FR-AUTH-2: Password Security
+
+The system shall hash passwords before storing them.
+
+### FR-AUTH-3: User Login
+
+The system shall authenticate users using email and password.
+
+### FR-AUTH-4: JWT Issuance
+
+The system shall issue JWT tokens after successful authentication.
+
+### FR-AUTH-5: Role-Based Authorization
+
+The system shall enforce role-based access control.
+
+---
+
+# 3.2 Event Service
+
+## Description
+
+Handles event creation and management operations.
+
+---
+
+## Functional Requirements
+
+### FR-EVENT-1: Create Event
+
+Organizers shall be able to create events containing:
+
+* Title
+* Description
+* Capacity
+* Date
+* Location
+
+### FR-EVENT-2: Update Event
+
+Organizers shall be able to modify event details.
+
+### FR-EVENT-3: Cancel Event
+
+Organizers shall be able to cancel events.
+
+### FR-EVENT-4: Capacity Validation
+
+The system shall prevent reducing event capacity below active registrations.
+
+### FR-EVENT-5: Event Retrieval
+
+Users shall be able to retrieve event information.
+
+### FR-EVENT-6: Registration Status Validation
+
+The system shall prevent registrations against canceled events.
+
+---
+
+# 3.3 Registration Service
+
+## Description
+
+Handles attendee registrations and registration constraints.
+
+---
+
+## Functional Requirements
+
+### FR-REG-1: Register for Event
+
+Attendees shall be able to register for events.
+
+### FR-REG-2: Duplicate Registration Prevention
+
+The system shall prevent duplicate attendee registrations for the same event.
+
+### FR-REG-3: Capacity Enforcement
+
+The system shall reject registrations when event capacity is full.
+
+### FR-REG-4: Cancel Registration
+
+Attendees shall be able to cancel their own registrations.
+
+### FR-REG-5: Registration Count Retrieval
+
+The service shall expose internal APIs for retrieving registration counts.
+
+### FR-REG-6: Attendee List Retrieval
+
+The service shall expose attendee lists for organizers.
+
+---
+
+# 3.4 Notification Service
+
+## Description
+
+Handles notification generation and persistence.
+
+---
+
+## Functional Requirements
+
+### FR-NOTIF-1: Notification Creation
+
+The system shall generate notifications for relevant event operations.
+
+### FR-NOTIF-2: Notification Persistence
+
+Notifications shall be stored in the database.
+
+### FR-NOTIF-3: Read Status Tracking
+
+The system shall track whether notifications are read.
+
+### FR-NOTIF-4: Event-Based Notifications
+
+Notifications shall be generated for:
+
+* Event updates
+* Event cancellations
+* Registration actions
+
+### FR-NOTIF-5: Subscriber Extensibility
+
+The notification architecture shall support adding new subscribers without modifying publisher logic.
+
+---
+
+# 3.5 API Gateway
+
+## Description
+
+Acts as the single entry point for external requests.
+
+---
+
+## Functional Requirements
+
+### FR-GATEWAY-1: Route Requests
+
+The gateway shall route requests to appropriate services.
+
+### FR-GATEWAY-2: Load-Balanced Routing
+
+The gateway shall support discovery-based routing using Eureka.
+
+### FR-GATEWAY-3: JWT Validation
+
+The gateway shall validate JWT tokens before forwarding requests.
+
+---
+
+# 3.6 Service Discovery
+
+## Functional Requirements
+
+### FR-EUREKA-1: Service Registration
+
+All services shall register with Eureka automatically.
+
+### FR-EUREKA-2: Service Lookup
+
+Services shall resolve each other using logical service names.
+
+---
+
+# 4. Internal APIs
+
+## Event Service Internal APIs
+
+| Endpoint                   | Purpose                |
+| -------------------------- | ---------------------- |
+| /internal/events/{eventId} | Retrieve event summary |
+
+---
+
+## Registration Service Internal APIs
+
+| Endpoint                                          | Purpose                            |
+| ------------------------------------------------- | ---------------------------------- |
+| /internal/registrations/event/{eventId}/attendees | Retrieve attendee list             |
+| /internal/registrations/event/{eventId}/count     | Retrieve active registration count |
+| /internal/registrations/event/{eventId}/cancel    | Cancel registrations               |
+
+---
+
+## Notification Service Internal APIs
+
+| Endpoint                      | Purpose                    |
+| ----------------------------- | -------------------------- |
+| /internal/notifications/event | Create event notifications |
+
+---
+
+# 5. Non-Functional Requirements
+
+# 5.1 Security Requirements
+
+### NFR-SEC-1
+
+All external APIs shall require JWT authentication.
+
+### NFR-SEC-2
+
+Internal APIs shall require X-Service-Token validation.
+
+### NFR-SEC-3
+
+Passwords shall never be stored in plain text.
+
+### NFR-SEC-4
+
+Services shall operate statelessly.
+
+---
+
+# 5.2 Performance Requirements
+
+### NFR-PERF-1
+
+Gateway routing latency shall remain minimal under normal load.
+
+### NFR-PERF-2
+
+Services shall support concurrent requests independently.
+
+### NFR-PERF-3
+
+Database indexing shall be used for high-frequency lookup fields.
+
+---
+
+# 5.3 Reliability Requirements
+
+### NFR-REL-1
+
+Services shall restart independently if failures occur.
+
+### NFR-REL-2
+
+Docker health checks shall ensure service readiness.
+
+### NFR-REL-3
+
+Centralized validation shall reduce inconsistent system states.
+
+---
+
+# 5.4 Scalability Requirements
+
+### NFR-SCALE-1
+
+Each service shall be independently scalable.
+
+### NFR-SCALE-2
+
+Additional notification subscribers shall be supported without architectural changes.
+
+### NFR-SCALE-3
+
+Gateway routing shall support multiple service instances.
+
+---
+
+# 5.5 Maintainability Requirements
+
+### NFR-MAIN-1
+
+The system shall follow layered architecture principles.
+
+### NFR-MAIN-2
+
+Controllers shall remain thin and delegate business logic to services.
+
+### NFR-MAIN-3
+
+Business rules shall be centralized in service layers.
+
+### NFR-MAIN-4
+
+Exception handling shall be centralized.
+
+---
+
+# 5.6 Observability Requirements
+
+### NFR-OBS-1
+
+AOP logging shall monitor all service-layer operations.
+
+### NFR-OBS-2
+
+Logs shall include:
+
+* Method name
+* Parameters
+* Execution duration
+* Exception information
+
+### NFR-OBS-3
+
+Observability concerns shall remain separated from business logic.
+
+---
+
+# 6. Data Requirements
+
+## 6.1 Database Ownership
+
+Each service shall own its tables independently.
+
+---
+
+## 6.2 Cross-Service References
+
+Cross-service relations shall use UUID references instead of JPA relationships.
+
+---
+
+## 6.3 Validation Constraints
+
+The system shall enforce:
+
+* Unique emails
+* Unique registrations per attendee-event pair
+* Required DTO fields
+* Positive numeric values
+
+---
+
+# 7. Design Constraints
+
+## 7.1 Technology Constraints
+
+The backend must use:
+
+* Spring Boot
+* Spring Cloud Gateway
+* Eureka
+* PostgreSQL
+* Docker
+
+---
+
+## 7.2 Architectural Constraints
+
+* Services must remain independently deployable.
+* Communication must use REST APIs.
+* Services must remain stateless.
+
+---
+
+# 8. Design Patterns and Architectural Concepts
+
+# 8.1 Publisher/Subscriber Pattern
+
+The Notification Service uses the Publisher/Subscriber pattern:
+
+* Publisher creates notification events.
+* Subscribers process events independently.
+* New subscribers can be added without modifying existing logic.
+
+Benefits:
+
+* Loose coupling
+* Extensibility
+* Maintainability
+
+---
+
+# 8.2 Aspect Oriented Programming (AOP)
+
+AOP is used for:
+
+* Logging
+* Observability
+* Performance monitoring
+
+Benefits:
+
+* Reduced duplicated logging code
+* Centralized observability
+* Cleaner service implementation
+
+---
+
+# 8.3 Validation as OCL Alternative
+
+Business constraints are enforced through:
+
+* Bean Validation
+* Database constraints
+* Service-layer validation logic
+
+---
+
+# 9. Deployment Requirements
+
+## Docker Deployment
+
+The system shall support deployment using Docker Compose.
+
+---
+
+## Default Ports
+
+| Service              | Port |
+| -------------------- | ---- |
+| Gateway              | 8080 |
+| Auth Service         | 8081 |
+| Event Service        | 8082 |
+| Registration Service | 8083 |
+| Notification Service | 8084 |
+| Eureka Server        | 8761 |
+| PostgreSQL           | 5433 |
+
+---
+
+# 10. Assumptions and Dependencies
+
+## Assumptions
+
+* Users have internet connectivity.
+* Docker environment is available.
+* PostgreSQL is accessible.
+
+---
+
+## Dependencies
+
+* Spring Boot
+* Spring Security
+* Spring Cloud
+* PostgreSQL Driver
+* Docker Engine
+
+---
+
+# 11. Future Enhancements
+
+Potential future improvements include:
+
+* Email notifications
+* SMS notifications
+* Message queues (Kafka/RabbitMQ)
+* Distributed tracing
+* API rate limiting
+* Kubernetes deployment
+* Circuit breakers and resilience patterns
+* Real-time WebSocket notifications
+
+---
+
+# 12. Conclusion
+
+The Event Management System backend is designed as a modular microservices platform emphasizing:
+
+* Separation of concerns
+* Scalability
+* Security
+* Maintainability
+* Extensibility
+
+The architecture combines Spring Cloud infrastructure, secure REST communication, Docker-based deployment, and layered clean-code principles to create a production-oriented backend suitable for modern distributed systems.
