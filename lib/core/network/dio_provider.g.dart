@@ -1,13 +1,7 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'dio_provider.dart';
 
-// **************************************************************************
-// RiverpodGenerator
-// **************************************************************************
 
-// GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: type=lint, type=warning
 
 @ProviderFor(dio)
 final dioProvider = DioProvider._();
